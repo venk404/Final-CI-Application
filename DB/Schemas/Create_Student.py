@@ -12,6 +12,7 @@ db_host = os.getenv('POSTGRES_HOST')
 db_port = os.getenv('POSTGRES_PORT')
 
 
+
 def create_schema():
     while True:
         try:
