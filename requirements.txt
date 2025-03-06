@@ -7,4 +7,5 @@ loguru
 requests
 flake8
 pydantic[email]
+psycopg2-binary
 psycopg2
