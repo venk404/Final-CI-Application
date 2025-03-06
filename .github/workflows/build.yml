@@ -28,11 +28,6 @@ jobs:
         with:
           fetch-depth: 0  # Fetch all history for all branches and tags
       
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        if: steps.python-check.outputs.skip-python-setup != 'true'
-        with:
-          python-version: '3.13'
       
       - name: Cache pip packages
         uses: actions/cache@v3
