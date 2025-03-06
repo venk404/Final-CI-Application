@@ -28,20 +28,6 @@ jobs:
         with:
           fetch-depth: 0  # Fetch all history for all branches and tags
       
-      - name: Check Python Version
-              id: python-check
-              run: |
-                if command -v python3.13 &> /dev/null; then
-                  echo "Python 3.13 is already installed"
-                  echo "skip-python-setup=true" >> $GITHUB_OUTPUT
-                elif command -v python3 &> /dev/null && python3 --version | grep -q "Python 3.13"; then
-                  echo "Python 3.13 is already installed"
-                  echo "skip-python-setup=true" >> $GITHUB_OUTPUT
-                else
-                  echo "Python 3.13 needs to be installed"
-                  echo "skip-python-setup=false" >> $GITHUB_OUTPUT
-                fi
-            
       - name: Set up Python
         uses: actions/setup-python@v2
         if: steps.python-check.outputs.skip-python-setup != 'true'
