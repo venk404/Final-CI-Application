@@ -39,6 +39,11 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
+          
+      - name: Install PostgreSQL development libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpq-dev python3-dev
       
       - name: Install Dependencies
         run: |
