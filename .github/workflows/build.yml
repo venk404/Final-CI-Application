@@ -53,11 +53,11 @@ jobs:
 
       - name: Run tests
         run: |
-            make test
+            python ./test/test.py
 
       - name: Run Pylint
         run: |
-          make Code_linting
+          python -m flake8 .
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
