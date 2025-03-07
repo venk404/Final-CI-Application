@@ -46,6 +46,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/restapi:{{github.sha}}
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/restapi:${{ github.sha }}
 
        
