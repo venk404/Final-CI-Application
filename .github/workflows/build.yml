@@ -24,14 +24,31 @@ on:
 
 jobs:
   build:
-    #runs-on: ubuntu-latest
     runs-on: self-hosted
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch all history for all branches and tags
+          fetch-depth: 0  
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.13'
+      
+      - name: Cache pip packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install --no-cache-dir -r requirements.txt
 
       - name: Run tests
         run: |
@@ -52,6 +69,12 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/restapi:${{ github.sha }}
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/studentapi:v${{ github.sha }}
 
-       
+      - name: Trigger CD workflow in another repository
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          repository: venk404/venk404-Implementing-Continuous-Delivery-with-ArgoCD
+          event-type: update-image
+          client-payload: '{"image_tag": "${{ github.sha }}", "repository": "${{ github.repository }}"}'
