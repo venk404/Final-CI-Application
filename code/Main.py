@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from fastapi import APIRouter, Request ,Response
+from fastapi import APIRouter, Request, Response
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from Models import insertstudent, get_all_students
 from Models import get_student_by_Id, Update_student, delete_student
@@ -15,13 +15,13 @@ from loguru import logger
 import sys
 import time
 import psycopg2
-from prometheus_client import Counter, Histogram, Gauge, start_http_server
+from prometheus_client import Counter, Histogram
 
 
 # Configure Loguru to emit JSON logs
 def serialize(record):
     subset = {
-        "timestamp" : record["time"].strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
+        "timestamp": record["time"].strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
         "message": record["message"],
         "level": record["level"].name,
         "function": record["function"],
@@ -35,9 +35,10 @@ def serialize(record):
 def patching(record):
     record["extra"]["serialized"] = serialize(record)
 
+
 logger.remove()
 logger = logger.patch(patching)
-logger.add(sys.stderr, format="{extra[serialized]}",backtrace=True)
+logger.add(sys.stderr, format="{extra[serialized]}", backtrace=True)
 
 load_dotenv()
 
@@ -121,19 +122,23 @@ async def prometheus_metrics(request: Request, call_next):
     """
     endpoint = request.url.path
     method = request.method
-    
     start_time = time.time()
     try:
         response = await call_next(request)
         status_code = response.status_code
-        REQUEST_COUNT.labels(endpoint=endpoint, method=method, status_code=status_code).inc()
-        REQUEST_LATENCY.labels(endpoint=endpoint, method=method).observe(time.time() - start_time)
+        REQUEST_COUNT.labels(endpoint=endpoint, method=method,
+                             status_code=status_code).inc()
+        REQUEST_LATENCY.labels(endpoint=endpoint,
+                               method=method).observe(time.time() - start_time)
         if status_code >= 400:
-            ERROR_COUNT.labels(endpoint=endpoint, method=method, status_code=status_code).inc()
+            ERROR_COUNT.labels(endpoint=endpoint, method=method,
+                               status_code=status_code).inc()
         return response
     except Exception as e:
-        ERROR_COUNT.labels(endpoint=endpoint, method=method, status_code=500).inc()
+        ERROR_COUNT.labels(endpoint=endpoint, method=method,
+                           status_code=500).inc()
         raise e
+
 
 # Middleware to catch malformed JSON
 @app.middleware("http")
@@ -148,7 +153,8 @@ async def handle_malformed_json(request: Request, call_next):
             return JSONResponse(
                 status_code=400,
                 content={
-                    "error": "Given Json is not well formatted, please check the input Json",
+                    "error": """Given Json is not well formatted,
+                                please check the input Json""",
                     "details": str(e),
                 },
             )
@@ -167,7 +173,8 @@ async def validation_exception_handler(request, exc: RequestValidationError):
         if type_error == "value_error.number.not_a_number":
             msg = "The value provided is not a valid number. Check the input."
         elif type_error.startswith("type_error"):
-            msg = f"Invalid type for {loc}. Expected a valid {type_error.split('.')[-1]}."
+            msg = f"""Invalid type for {loc}.
+                       Expected a valid {type_error.split('.')[-1]}."""
 
         error_messages.append(f"{loc}: {msg}")
 
@@ -377,7 +384,9 @@ async def HealthCheck() -> dict:
         "status": "healthy",
         "components": {
             "database": {"status": "unknown", "details": ""},
-            "application": {"status": "up", "uptime_seconds": int(time.time() - app.start_time)}
+            "application": {"status": "up",
+                            "uptime_seconds":
+                            int(time.time() - app.start_time)}
         }
     }
 
@@ -388,7 +397,6 @@ async def HealthCheck() -> dict:
             user=os.getenv('POSTGRES_USER'),
             password=os.getenv('POSTGRES_PASSWORD'),
             host=os.getenv('POSTGRES_HOST'),
-            
         )
         cur = conn.cursor()
         cur.execute("SELECT 1;")
@@ -408,6 +416,7 @@ async def HealthCheck() -> dict:
         })
         return JSONResponse(status_code=503, content=health_status)
 
+
 # Expose Prometheus metrics endpoint
 @app.get("/metrics", include_in_schema=False)
 async def metrics():
@@ -422,6 +431,5 @@ app.include_router(version_v1, tags=['Version 1 Api Endpoints'])
 app.include_router(version_v2, prefix='/v2', tags=['Version 2 Api Endpoints'])
 
 if __name__ == "__main__":
-    #start_http_server(8001)  # Expose metrics on port 8001
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)

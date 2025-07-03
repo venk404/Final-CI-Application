@@ -3,10 +3,8 @@ from psycopg2.extras import RealDictCursor
 import os
 from dotenv import load_dotenv
 from loguru import logger
-import sys
 import json
 
-           
 load_dotenv()
 
 db_name = os.getenv('POSTGRES_DB')
@@ -16,12 +14,15 @@ db_host = os.getenv('POSTGRES_HOST')
 db_port = os.getenv('POSTGRES_PORT')
 
 if not all([db_name, db_user, db_password, db_host, db_port]):
-    logger.error("One or more required environment variables are not set or empty.")
+    logger.error("""One or more required
+                    environment variables are not set or empty.""")
     exit(1)
 
+
+# Configure logger
 def serialize(record):
     subset = {
-        "timestamp" : record["time"].strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
+        "timestamp": record["time"].strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
         "message": record["message"],
         "level": record["level"].name,
         "function": record["function"],
@@ -34,6 +35,7 @@ def serialize(record):
 
 def patching(record):
     record["extra"]["serialized"] = serialize(record)
+
 
 conn = psycopg2.connect(
             database=db_name,
@@ -137,7 +139,7 @@ def Update_student(id, student):
         conn.rollback()
         logger.error(f'error:"{str(e)}')
         return {"status": "error", "message":
-        "An unexpected error occurred. Please contact support."}
+                "An unexpected error occurred. Please contact support."}
 
 
 def delete_student(id):
@@ -156,4 +158,4 @@ def delete_student(id):
         conn.rollback()
         logger.error(f"Database error: {str(e)}")
         return {"status": "error", "message":
-        "An unexpected error occurred. Please contact support."}
+                "An unexpected error occurred. Please contact support."}
