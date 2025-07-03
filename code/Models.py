@@ -4,10 +4,9 @@ import os
 from dotenv import load_dotenv
 from loguru import logger
 import sys
+import json
 
-
-logger.add(sys.stdout, format="{time} {level} {message}",
-           filter="my_module", backtrace=True)
+           
 load_dotenv()
 
 db_name = os.getenv('POSTGRES_DB')
@@ -15,6 +14,26 @@ db_user = os.getenv('POSTGRES_USER')
 db_password = os.getenv('POSTGRES_PASSWORD')
 db_host = os.getenv('POSTGRES_HOST')
 db_port = os.getenv('POSTGRES_PORT')
+
+if not all([db_name, db_user, db_password, db_host, db_port]):
+    logger.error("One or more required environment variables are not set or empty.")
+    exit(1)
+
+def serialize(record):
+    subset = {
+        "timestamp" : record["time"].strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
+        "message": record["message"],
+        "level": record["level"].name,
+        "function": record["function"],
+        "line": record["line"],
+        "file": record["file"].name,
+        "module": record["module"]
+    }
+    return json.dumps(subset)
+
+
+def patching(record):
+    record["extra"]["serialized"] = serialize(record)
 
 conn = psycopg2.connect(
             database=db_name,
@@ -37,7 +56,8 @@ def insertstudent(data: dict):
     except psycopg2.Error as e:
         conn.rollback()
         logger.error(f'error:"{str(e)}')
-        return {"status": "error", "message": str(e)}
+        return {"status": "error", "message":
+                "An unexpected error occurred. Please contact support."}
 
 
 def get_all_students():
@@ -56,7 +76,8 @@ def get_all_students():
     except psycopg2.Error as e:
         conn.rollback()
         logger.error(f'error:"{str(e)}')
-        return {"status": "error", "message": str(e)}
+        return {"status": "error", "message":
+                "An unexpected error occurred. Please contact support."}
 
 
 def get_student_by_Id(id):
@@ -73,7 +94,6 @@ def get_student_by_Id(id):
             return {"status": "error", "message": "No Data found"}
     except Exception as e:
         # Catch Unexpected Errors
-        conn.rollback()
         logger.error(f"Unexpected error: {e}")
         return {"status": "error", "message":
                 "An unexpected error occurred. Please contact support."}
@@ -116,7 +136,8 @@ def Update_student(id, student):
     except psycopg2.Error as e:
         conn.rollback()
         logger.error(f'error:"{str(e)}')
-        return {"status": "error", "message": str(e)}
+        return {"status": "error", "message":
+        "An unexpected error occurred. Please contact support."}
 
 
 def delete_student(id):
@@ -134,4 +155,5 @@ def delete_student(id):
     except psycopg2.Error as e:
         conn.rollback()
         logger.error(f"Database error: {str(e)}")
-        return {"status": "error", "message": "Database error occurred"}
+        return {"status": "error", "message":
+        "An unexpected error occurred. Please contact support."}
