@@ -209,7 +209,7 @@ async def create_student(student: Student) -> Student:
                 "endpoint": "/AddStudent",
                 "method": "POST"
             })
-            time.sleep(2)
+            time.sleep(5)
             return JSONResponse(content={"message": "Student data added",
                                          "student_id": res["student_id"]})
         else:
@@ -276,6 +276,7 @@ async def get_student(id: int) -> dict:
             "method": "GET"
         })
         res = get_student_by_Id(id)
+        time.sleep(10)
         if res['status'] == "success":
             logger.info({
                 "event": "get_student_success",
