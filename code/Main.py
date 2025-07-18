@@ -51,7 +51,7 @@ REQUEST_COUNT = Counter(
 REQUEST_LATENCY = Histogram(
     'api_request_latency_seconds',
     'API request latency in seconds',
-    ['endpoint', 'method','status_code'],
+    ['endpoint', 'method', 'status_code'],
     buckets=[0.1, 0.3, 0.5, 1.0, 2.0, 5.0, 10.0]
 )
 ERROR_COUNT = Counter(
