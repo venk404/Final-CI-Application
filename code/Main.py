@@ -129,7 +129,7 @@ async def prometheus_metrics(request: Request, call_next):
         REQUEST_COUNT.labels(endpoint=endpoint, method=method,
                              status_code=status_code).inc()
         REQUEST_LATENCY.labels(endpoint=endpoint,
-                               method=method).observe(time.time() - start_time)
+                               method=method,status_code=status_code).observe(time.time() - start_time)
         if status_code >= 400:
             ERROR_COUNT.labels(endpoint=endpoint, method=method,
                                status_code=status_code).inc()
@@ -209,7 +209,6 @@ async def create_student(student: Student) -> Student:
                 "endpoint": "/AddStudent",
                 "method": "POST"
             })
-            time.sleep(5)
             return JSONResponse(content={"message": "Student data added",
                                          "student_id": res["student_id"]})
         else:
@@ -239,7 +238,6 @@ async def get_students() -> dict:
             "method": "GET"
         })
         res = jsonable_encoder(get_all_students())
-        time.sleep(5)
         if res['status'] == "success":
             logger.info({
                 "event": "get_all_students_success",
@@ -276,7 +274,6 @@ async def get_student(id: int) -> dict:
             "method": "GET"
         })
         res = get_student_by_Id(id)
-        time.sleep(10)
         if res['status'] == "success":
             logger.info({
                 "event": "get_student_success",
