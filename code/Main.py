@@ -128,8 +128,9 @@ async def prometheus_metrics(request: Request, call_next):
         status_code = response.status_code
         REQUEST_COUNT.labels(endpoint=endpoint, method=method,
                              status_code=status_code).inc()
-        REQUEST_LATENCY.labels(endpoint=endpoint,
-                               method=method,status_code=status_code).observe(time.time() - start_time)
+        REQUEST_LATENCY.labels(endpoint=endpoint, method=method,
+                               status_code=status_code
+                               ).observe(time.time() - start_time)
         if status_code >= 400:
             ERROR_COUNT.labels(endpoint=endpoint, method=method,
                                status_code=status_code).inc()
