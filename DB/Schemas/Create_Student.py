@@ -3,14 +3,41 @@ from loguru import logger
 import time
 import os
 from dotenv import load_dotenv
+import sys
+import json
 
 load_dotenv()
+def serialize(record):
+    subset = {
+        "timestamp": record["time"].strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
+        "message": record["message"],
+        "level": record["level"].name,
+        "function": record["function"],
+        "line": record["line"],
+        "file": record["file"].name,
+        "module": record["module"]
+    }
+    return json.dumps(subset)
+
+
+def patching(record):
+    record["extra"]["serialized"] = serialize(record)
+
+
+logger.remove()
+logger = logger.patch(patching)
+logger.add(sys.stderr, format="{extra[serialized]}",backtrace=True)
+
 db_name = os.getenv('POSTGRES_DB')
 db_user = os.getenv('POSTGRES_USER')
 db_password = os.getenv('POSTGRES_PASSWORD')
 db_host = os.getenv('POSTGRES_HOST')
 db_port = os.getenv('POSTGRES_PORT')
 
+if not all([db_name, db_user, db_password, db_host, db_port]):
+    logger.error({"One or more required environment "
+                 "variables are not set or empty."})
+    exit(1)
 
 def create_schema():
     while True:
@@ -36,8 +63,8 @@ def create_schema():
             conn.close()
             logger.info("Schema Created")
             break
-        except (Exception, psycopg2.DatabaseError) as error:
-            print("Schema Not Created Errors:", error)
+        except Exception as error:
+            logger.error({f"message:Schema Not Created Errors: {error}"})
             time.sleep(10)
             continue
 
