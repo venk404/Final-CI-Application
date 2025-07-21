@@ -7,6 +7,8 @@ import sys
 import json
 
 load_dotenv()
+
+
 def serialize(record):
     subset = {
         "timestamp": record["time"].strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
@@ -26,7 +28,7 @@ def patching(record):
 
 logger.remove()
 logger = logger.patch(patching)
-logger.add(sys.stderr, format="{extra[serialized]}",backtrace=True)
+logger.add(sys.stderr, format="{extra[serialized]}", backtrace=True)
 
 db_name = os.getenv('POSTGRES_DB')
 db_user = os.getenv('POSTGRES_USER')
@@ -38,6 +40,7 @@ if not all([db_name, db_user, db_password, db_host, db_port]):
     logger.error({"One or more required environment "
                  "variables are not set or empty."})
     exit(1)
+
 
 def create_schema():
     while True:
