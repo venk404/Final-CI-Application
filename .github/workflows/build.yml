@@ -105,7 +105,33 @@ jobs:
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.version=${{ steps.get_versions.outputs.MIGRATION_VERSION }}
-
+      - name: Build client payload
+        if: steps.changed-files.outputs.any_changed == 'true'
+        id: build-payload
+        run: |
+          payload=$(cat << 'EOF'
+          {
+            "restapi_version": "${{ steps.get_versions.outputs.RESTAPI_VERSION }}",
+            "migration_version": "${{ steps.get_versions.outputs.MIGRATION_VERSION }}",
+            "repository": "${{ github.repository }}",
+            "images": []
+          }
+          EOF
+          )
+          
+          # Add REST API image if code/test files changed
+          if [[ "${{ contains(steps.changed-files.outputs.changed_files, 'code/') || contains(steps.changed-files.outputs.changed_files, 'test/') }}" == "true" ]]; then
+            payload=$(echo "$payload" | jq '.images += ["docker.io/${{ vars.DOCKERHUB_USERNAME }}/studentapi:${{ steps.get_versions.outputs.RESTAPI_VERSION }}"]')
+          fi
+          
+          # Add migration image if DB schema files changed
+          if [[ "${{ contains(steps.changed-files.outputs.changed_files, 'DB/Schemas/') }}" == "true" ]]; then
+            payload=$(echo "$payload" | jq '.images += ["docker.io/${{ vars.DOCKERHUB_USERNAME }}/db_migration:${{ steps.get_versions.outputs.MIGRATION_VERSION }}"]')
+          fi
+          
+          echo "payload<<EOF" >> $GITHUB_OUTPUT
+          echo "$payload" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
       - name: Trigger CD workflow in another repository
         if: steps.changed-files.outputs.any_changed == 'true'
         uses: peter-evans/repository-dispatch@v2
@@ -113,13 +139,4 @@ jobs:
           token: ${{ secrets.PAT_TOKEN }}
           repository: venk404/venk404-Implementing-Continuous-Delivery-with-ArgoCD
           event-type: update-image
-          client-payload: |
-            {
-              "restapi_version": "${{ steps.get_versions.outputs.RESTAPI_VERSION }}",
-              "migration_version": "${{ steps.get_versions.outputs.MIGRATION_VERSION }}",
-              "repository": "${{ github.repository }}",
-              "images": [
-                ${{ steps.changed-files.outputs.any_changed == 'true' && (contains(steps.changed-files.outputs.changed_files, 'code/') || contains(steps.changed-files.outputs.changed_files, 'test/')) && format('"docker.io/{0}/studentapi:{1}"', vars.DOCKERHUB_USERNAME, steps.get_versions.outputs.RESTAPI_VERSION) || '' }},
-                ${{ steps.changed-files.outputs.any_changed == 'true' && contains(steps.changed-files.outputs.changed_files, 'DB/Schemas/') && format('"docker.io/{0}/db_migration:{1}"', vars.DOCKERHUB_USERNAME, steps.get_versions.outputs.MIGRATION_VERSION) || '' }}
-              ] | jq -c '[.[] | select(. != "")]'
-            }
+          client-payload: ${{ steps.build-payload.outputs.payload }}
