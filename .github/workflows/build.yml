@@ -121,5 +121,5 @@ jobs:
               "images": [
                 ${{ steps.changed-files.outputs.any_changed == 'true' && (contains(steps.changed-files.outputs.changed_files, 'code/') || contains(steps.changed-files.outputs.changed_files, 'test/')) && format('"docker.io/{0}/studentapi:{1}"', vars.DOCKERHUB_USERNAME, steps.get_versions.outputs.RESTAPI_VERSION) || '' }},
                 ${{ steps.changed-files.outputs.any_changed == 'true' && contains(steps.changed-files.outputs.changed_files, 'DB/Schemas/') && format('"docker.io/{0}/db_migration:{1}"', vars.DOCKERHUB_USERNAME, steps.get_versions.outputs.MIGRATION_VERSION) || '' }}
-              ]
+              ] | jq -c '[.[] | select(. != "")]'
             }
