@@ -1,4 +1,5 @@
-FROM python:3.13-alpine
+# Build stage
+FROM python:3.13-alpine as builder
 
 WORKDIR /app
 
@@ -9,7 +10,19 @@ RUN apk add --no-cache postgresql-dev gcc musl-dev
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the schema creation script
+# Runtime stage
+FROM python:3.13-alpine
+
+WORKDIR /app
+
+# Install only runtime dependencies
+RUN apk add --no-cache libpq
+
+# Copy installed Python packages from builder
+COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# Copy the application
 COPY Create_Student.py .
 
 CMD ["python", "Create_Student.py"]
