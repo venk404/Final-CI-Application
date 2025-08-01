@@ -105,6 +105,8 @@ jobs:
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.version=${{ steps.get_versions.outputs.RESTAPI_VERSION }}
+          outputs:
+            type: registry
 
       - name: Build and push migrations image
         if: steps.changed-files.outputs.db_any_changed == 'true'
@@ -117,6 +119,8 @@ jobs:
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.version=${{ steps.get_versions.outputs.MIGRATION_VERSION }}
+          outputs:
+            type: registry
       
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
@@ -148,6 +152,7 @@ jobs:
           echo "payload<<EOF" >> $GITHUB_OUTPUT
           echo "$payload" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Trigger CD workflow in another repository
         if: steps.changed-files.outputs.code_any_changed == 'true' || steps.changed-files.outputs.db_any_changed == 'true'
         uses: peter-evans/repository-dispatch@v2
