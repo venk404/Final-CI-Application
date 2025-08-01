@@ -39,6 +39,8 @@ jobs:
       
       - name: Cache pip packages
         uses: actions/cache@v3
+        timeout-minutes: 5  # Add timeout
+        continue-on-error: true 
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
