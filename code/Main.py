@@ -75,7 +75,7 @@ class Student(BaseModel):
                 {
                     "name": "Ganesh Gaitonde",
                     "email": "Gopalmat@gmail.com",
-                    "age": 11,
+                    "age": 22,
                     "phone": "1234567890"
                 }
             ]
@@ -99,7 +99,7 @@ class UpdateStudent(BaseModel):
                 {
                     "name": "Ganesh Gaitonde",
                     "email": "Gopalmate@gmail.com",
-                    "age": 11,
+                    "age": 22,
                     "phone": "1234567890"
                 }
             ]
