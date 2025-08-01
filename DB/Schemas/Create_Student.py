@@ -38,7 +38,7 @@ db_port = os.getenv('POSTGRES_PORT')
 
 if not all([db_name, db_user, db_password, db_host, db_port]):
     logger.error({"One or more required environment "
-                 "variables are not set or empty."})
+                 "variables are not Set or empty."})
     exit(1)
 
 
