@@ -86,6 +86,14 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       
+      - name: Debug changed files
+        run: |
+          echo "Any changed: ${{ steps.changed-files.outputs.any_changed }}"
+          echo "Changed files: ${{ steps.changed-files.outputs.changed_files }}"
+          echo "Code changes: ${{ contains(steps.changed-files.outputs.changed_files, 'code/') }}"
+          echo "Test changes: ${{ contains(steps.changed-files.outputs.changed_files, 'test/') }}"
+          echo "DB changes: ${{ contains(steps.changed-files.outputs.changed_files, 'DB/Schemas/') }}"
+      
       - name: Build and push REST API image
         if: steps.changed-files.outputs.any_changed == 'true' && (contains(steps.changed-files.outputs.changed_files, 'code/') || contains(steps.changed-files.outputs.changed_files, 'test/'))
         uses: docker/build-push-action@v6

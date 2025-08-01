@@ -74,7 +74,7 @@ class Student(BaseModel):
             'examples': [
                 {
                     "name": "Ganesh Gaitonde",
-                    "email": "Gopalmate@gmail.com",
+                    "email": "Gopalmat@gmail.com",
                     "age": 22,
                     "phone": "1234567890"
                 }
