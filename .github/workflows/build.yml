@@ -117,6 +117,9 @@ jobs:
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.version=${{ steps.get_versions.outputs.MIGRATION_VERSION }}
+      
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
             
       - name: Build client payload
         if: steps.changed-files.outputs.code_any_changed == 'true' || steps.changed-files.outputs.db_any_changed == 'true'
