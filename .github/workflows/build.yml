@@ -75,10 +75,12 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v45
         with:
-          files: |
-            code/**
-            test/**
-            DB/Schemas/**
+          files_yaml: |
+            code:
+              - 'code/**'
+              - 'test/**'
+            db:
+              - 'DB/Schemas/**'
           
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -89,13 +91,11 @@ jobs:
       - name: Debug changed files
         run: |
           echo "Any changed: ${{ steps.changed-files.outputs.any_changed }}"
-          echo "Changed files: ${{ steps.changed-files.outputs.changed_files }}"
-          echo "Code changes: ${{ contains(steps.changed-files.outputs.changed_files, 'code/') }}"
-          echo "Test changes: ${{ contains(steps.changed-files.outputs.changed_files, 'test/') }}"
-          echo "DB changes: ${{ contains(steps.changed-files.outputs.changed_files, 'DB/Schemas/') }}"
+          echo "Code changes: ${{ steps.changed-files.outputs.code_any_changed }}"
+          echo "DB changes: ${{ steps.changed-files.outputs.db_any_changed }}"
       
       - name: Build and push REST API image
-        if: steps.changed-files.outputs.any_changed == 'true' && (contains(steps.changed-files.outputs.changed_files, 'code/') || contains(steps.changed-files.outputs.changed_files, 'test/'))
+        if: steps.changed-files.outputs.code_any_changed == 'true'
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -107,7 +107,7 @@ jobs:
             org.opencontainers.image.version=${{ steps.get_versions.outputs.RESTAPI_VERSION }}
 
       - name: Build and push migrations image
-        if: steps.changed-files.outputs.any_changed == 'true' && contains(steps.changed-files.outputs.changed_files, 'DB/Schemas/')
+        if: steps.changed-files.outputs.db_any_changed == 'true'
         uses: docker/build-push-action@v6
         with:
           context: ./DB/Schemas
@@ -117,6 +117,7 @@ jobs:
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.version=${{ steps.get_versions.outputs.MIGRATION_VERSION }}
+            
       - name: Build client payload
         if: steps.changed-files.outputs.any_changed == 'true'
         id: build-payload
@@ -132,12 +133,12 @@ jobs:
           )
           
           # Add REST API image if code/test files changed
-          if [[ "${{ contains(steps.changed-files.outputs.changed_files, 'code/') || contains(steps.changed-files.outputs.changed_files, 'test/') }}" == "true" ]]; then
+          if [[ "${{ steps.changed-files.outputs.code_any_changed }}" == "true" ]]; then
             payload=$(echo "$payload" | jq '.images += ["docker.io/${{ vars.DOCKERHUB_USERNAME }}/studentapi:${{ steps.get_versions.outputs.RESTAPI_VERSION }}"]')
           fi
           
           # Add migration image if DB schema files changed
-          if [[ "${{ contains(steps.changed-files.outputs.changed_files, 'DB/Schemas/') }}" == "true" ]]; then
+          if [[ "${{ steps.changed-files.outputs.db_any_changed }}" == "true" ]]; then
             payload=$(echo "$payload" | jq '.images += ["docker.io/${{ vars.DOCKERHUB_USERNAME }}/db_migration:${{ steps.get_versions.outputs.MIGRATION_VERSION }}"]')
           fi
           
