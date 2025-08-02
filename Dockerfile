@@ -33,5 +33,4 @@ RUN apk add --no-cache libpq
 EXPOSE 8000
 
 # Run the application
-CMD ["sh", "-c", "venv/bin/python DB/Schemas/Create_Student.py && cd code && python Main.py"]
-
+CMD ["sh", "-c", "python code/Main.py"]
