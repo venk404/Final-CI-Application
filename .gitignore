@@ -1,1 +1,7 @@
-actions-runner
+.env
+__pycache__/
+venv
+.gitignore
+__init__.py
+data/
+actions-runner/

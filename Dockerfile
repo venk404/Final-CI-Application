@@ -20,7 +20,9 @@ WORKDIR /app
 
 # Copy only the necessary files from the builder stage
 COPY --from=builder /app/venv /app/venv
-COPY . .
+
+COPY ./code/* /app/code/
+
 
 # Set environment variables
 ENV PATH="/app/venv/bin:$PATH"

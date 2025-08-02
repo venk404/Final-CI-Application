@@ -6,6 +6,6 @@ python-dotenv
 loguru
 requests
 flake8
-prometheus_client
+prometheus-client
 pydantic[email]
 psycopg2-binary

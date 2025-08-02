@@ -1,8 +1,8 @@
-version: '3'
+version: '3.8'
 
 networks:
   dem:
-    name: ${DOCKER_NETWORK}
+    name: dem
 
 services:
   restapi:
@@ -17,14 +17,19 @@ services:
       migration:
         condition: service_completed_successfully
     environment:
-      env_file: ".env"
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      #This should be service name of DB from docker-compose file
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
     ports:
       - "${APP_PORT}:8000"
     networks:
-      - ${DOCKER_NETWORK}
+      - dem
 
   DB:
-    image: postgres:latest
+    image: postgres:17.3
     restart: always
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
@@ -41,7 +46,7 @@ services:
     volumes:
       - ./data/db:/var/lib/postgresql/data 
     networks:
-      - ${DOCKER_NETWORK}
+      - dem
 
   migration:
     build: 
@@ -59,12 +64,4 @@ services:
         condition: service_healthy
         restart: true
     networks:
-      - ${DOCKER_NETWORK}
-
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - "8080:8080"
-    networks:
-      - ${DOCKER_NETWORK}
+      - dem
