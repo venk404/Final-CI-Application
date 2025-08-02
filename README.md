@@ -1,75 +1,108 @@
+# CI/CD Pipeline with GitHub Actions
 
-# Student Management API
+## Overview
+This repository demonstrates a comprehensive CI/CD pipeline using GitHub Actions to automate building, testing, and deploying a FastAPI application with Docker containers.
 
-This project is a simple Student Management API built using FastAPI. It allows for basic CRUD operations on student data. The API supports creating, reading, updating, and deleting student information.
+## Pipeline Features
+- 🔄 Automated builds on push and pull requests
+- 📦 Python dependency caching
+- ✅ Unit testing
+- 🔍 Code quality checks with Flake8
+- 🐳 Docker image building and publishing
+- 🚀 Triggering CD pipeline
 
+## Prerequisites
+- GitHub account
+- Self-hosted runner
+- Docker Hub account
 
+## Requirements
+- VMs for self-hosted runner
+- Docker & Docker Compose
+- Make utility
 
-## Features
+## Quick Start
 
-- Create Student: Add a new student.
-- Get All Students: Retrieve a list of all students.
-- Get Student by ID: Retrieve a specific student by their ID.
-- Update Student: Update a student's information.
-- Delete Student: Delete a student by their ID.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/your-repo.git
+   cd "Assignment 4"
+   ```
 
+2. **Build and Run**
+   ```bash
+   make all
+   ```
 
-## Requirments
-- Python 3.11+
-- PIP
-- Docker & Docker Compose(For database)
-- Make
-## Installation
-1) Clone the repository:
+## Individual Commands
 
+### Database Operations
+
+**Start Database**
 ```bash
-  git clone https://github.com/venk404/SRE--RestAPI.git
-```
-2) Execute the makeFile command (assuming make is installed on your system).
-
-```bash
-  cd .\Assignment 3
-```
-3) ## "Rename the .env file from the Schema folder and, in the root directory, the variable dev is used for versioning the image."
-
-
-4) The following command will start the DB container, run the DB DML migrations, build the REST API, and run the REST API Docker container.
-```bash
-  make all
-```
-## If you want to perform each target individually, use the following commands
-4) To start the DB container
-```bash
-  make Start_DB
-```
-5) Run the DB DML migrations
-
-```bash
-  make run-migrations
-```
-6) Build the REST API
-
-```bash
-  make build-api
+make Start_DB
 ```
 
-7) Run the REST API Docker container
-
+**Run Database Migrations**
 ```bash
-  make run-api
+make run-migrations
 ```
 
+### API Operations
 
-
-## To run Test
+**Build API**
 ```bash
-  make test
+make build-api
 ```
 
-## Documentation(API Documentation)
-
-- Refer to the API documentation for the endpoints listed below
+**Run API**
 ```bash
-  http://127.0.0.1:8000/docs
+make run-api
 ```
 
+### Testing
+
+**Run Tests**
+```bash
+make test
+```
+
+## CI Configuration
+
+### GitHub Secrets Required
+- `DOCKERHUB_TOKEN`: Docker Hub access token
+- `PAT_TOKEN`: GitHub Personal Access Token
+
+### GitHub Variables
+- `DOCKERHUB_USERNAME`: Your Docker Hub username
+
+## Workflow Triggers
+- Push to main branch
+- Pull request events
+- Manual workflow dispatch
+
+## Pipeline Stages
+
+1. **Setup & Build**
+   - Python environment setup
+   - Dependencies installation
+   - Package caching
+
+2. **Test & Quality**
+   - Unit tests execution
+   - Flake8 code linting
+
+3. **Docker Operations**
+   - Build REST API image
+   - Build DB migrations image
+   - Push to Docker Hub
+
+4. **Deployment**
+   - Trigger CD pipeline
+
+## API Documentation
+
+Access Swagger documentation at:
+```
+http://localhost:8000/docs
+```
