@@ -2,7 +2,7 @@
 
 # Variables
 VENV := venv
-include .env
+-include .env
 
 
 
