@@ -1,10 +1,17 @@
 # Build stage
-FROM python:3.13-alpine as builder
+FROM python:3.13-alpine AS builder
 
 WORKDIR /app
 
-# Install required packages
-RUN apk add --no-cache postgresql-dev gcc musl-dev
+# Install build dependencies
+RUN apk add --no-cache \
+    gcc=14.2.0-r6 \
+    musl-dev=1.2.5-r10 \
+    postgresql17-dev=17.5-r0
+
+# Create virtual environment
+RUN python -m venv /app/venv
+ENV PATH="/app/venv/bin:$PATH"
 
 # Install Python dependencies
 COPY requirements.txt .
@@ -15,14 +22,16 @@ FROM python:3.13-alpine
 
 WORKDIR /app
 
-# Install only runtime dependencies
-RUN apk add --no-cache libpq
+# Install runtime dependencies
+RUN apk add --no-cache libpq=17.5-r0
 
-# Copy installed Python packages from builder
-COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
+# Copy the entire virtual environment from builder
+COPY --from=builder /app/venv /app/venv
 
-# Copy the application
+# Set PATH to use the virtual environment
+ENV PATH="/app/venv/bin:$PATH"
+
+# Copy application code
 COPY Create_Student.py .
 
 CMD ["python", "Create_Student.py"]

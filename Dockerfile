@@ -3,7 +3,11 @@ FROM python:3.13-alpine AS builder
 WORKDIR /app
 
 # Install build dependencies
-RUN apk add --no-cache postgresql-dev=16.4-r0 gcc=13.2.1_git20240309-r0 musl-dev=1.2.5-r0
+RUN apk add --no-cache \
+    gcc=14.2.0-r6 \
+    musl-dev=1.2.5-r10 \
+    postgresql17-dev=17.5-r0
+
 # Create a virtual environment
 RUN python -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
@@ -26,8 +30,7 @@ COPY ./code/ /app/code/
 ENV PATH="/app/venv/bin:$PATH"
 
 # Install runtime dependencies
-RUN apk add --no-cache libpq=16.4-r0
-
+RUN apk add --no-cache libpq=17.5-r0
 
 # Expose port 8000
 

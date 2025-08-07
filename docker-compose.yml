@@ -9,7 +9,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile 
-    image: venkateshtangaraj/${IMAGE_NAME}:${IMAGE_VERSION}
+    image: ${IMAGE_NAME}:${IMAGE_VERSION}
     depends_on:
       DB:
         condition: service_healthy
@@ -52,7 +52,7 @@ services:
     build: 
       context: ./DB/Schemas/
       dockerfile: Dockerfile
-    image: migration:${IMAGE_VERSION}
+    image: db_migration:${IMAGE_VERSION}
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
