@@ -10,7 +10,7 @@ all: Run_all_containers
 
 
 Code_linting:
-	python -m flake8 .
+	$(VENV)\Scripts\python -m flake8 .
 
 Run_all_containers:
 	docker-compose up
@@ -64,9 +64,9 @@ endif
 
 test:
 ifeq ($(OS),Windows_NT)
-	python ./test/test.py
+	$(VENV)\Scripts\python ./test/test.py
 else
-	python ./test/test.py
+	$(VENV)\Scripts\python ./test/test.py
 endif
 
 .PHONY: all test clean Code_linting Run_all_containers Start_DB run-migrations Build-api docker_build-api docker_run-api
