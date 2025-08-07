@@ -8,4 +8,4 @@ requests
 flake8
 prometheus-client
 pydantic[email]
-psycopg2
+psycopg2-binary
