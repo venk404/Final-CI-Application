@@ -66,7 +66,7 @@ test:
 ifeq ($(OS),Windows_NT)
 	$(VENV)\Scripts\python ./test/test.py
 else
-	$(VENV)\Scripts\python ./test/test.py
+	$(VENV)/bin/python ./test/test.py
 endif
 
 .PHONY: all test clean Code_linting Run_all_containers Start_DB run-migrations Build-api docker_build-api docker_run-api
