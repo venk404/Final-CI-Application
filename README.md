@@ -18,7 +18,7 @@ This repository demonstrates a comprehensive CI/CD pipeline using GitHub Actions
 
 ## Requirements
 - VMs for self-hosted runner
-- Docker & Docker Compose
+- Docker & Docker Compose in runner machine.
 - Make utility
 
 ## Quick Start
