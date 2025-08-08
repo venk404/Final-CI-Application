@@ -10,7 +10,11 @@ all: Run_all_containers
 
 
 Code_linting:
+ifeq ($(OS),Windows_NT)
 	$(VENV)\Scripts\python -m flake8 .
+else
+	$(VENV)/bin/python -m flake8 .
+endif
 
 Run_all_containers:
 	docker-compose up
