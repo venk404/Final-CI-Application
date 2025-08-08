@@ -11,9 +11,11 @@ all: Run_all_containers
 
 Code_linting:
 ifeq ($(OS),Windows_NT)
-	$(VENV)\Scripts\python -m flake8 .
+	$(VENV)\Scripts\python -m flake8 code\
+	$(VENV)\Scripts\python -m flake8 test\
 else
-	$(VENV)/bin/python -m flake8 .
+	$(VENV)/bin/python -m flake8 code/
+	$(VENV)/bin/python -m flake8 test/
 endif
 
 Run_all_containers:
