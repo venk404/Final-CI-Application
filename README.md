@@ -25,8 +25,7 @@ This repository demonstrates a comprehensive CI/CD pipeline using GitHub Actions
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/your-repo.git
-   cd "Assignment 4"
+   git clone https://github.com/venk404/Final-CI-Application.git
    ```
 
 2. **Build and Run**
