@@ -50,14 +50,17 @@ jobs:
       
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y make jq
+
       - name: Install Dependencies
         run: make install
 
-      - name: Run tests
-        run: make test
 
       - name: Run Flake8
         run: make Code_linting
+
+
+      - name: Run tests
+        run: make test
       
       - name: Get version tags
         id: get_versions

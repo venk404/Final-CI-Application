@@ -54,7 +54,7 @@ else
 	chmod +x $(VENV)/bin/activate
 	$(VENV)/bin/activate
 	$(VENV)/bin/python -m pip install --upgrade pip
-	$(VENV)/bin/pip install -r requirements.txt
+	$(VENV)/bin/pip install -r requirements_dev.txt
 endif
 
 
