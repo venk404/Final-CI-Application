@@ -1,8 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from fastapi import APIRouter, Request, Response
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
-from Models import insertstudent, get_all_students
-from Models import get_student_by_Id, Update_student, delete_student
+from db_students import insertstudent, get_all_students
+from db_students import get_student_by_Id, Update_student, delete_student
 import uvicorn
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
